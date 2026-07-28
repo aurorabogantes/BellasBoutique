@@ -28,10 +28,10 @@ import Emails from './pages/admin/Emails';
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <CartProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
           <Routes>
           {/* Public / Client */}
           <Route path="/" element={<Login />} />
@@ -58,10 +58,10 @@ export default function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
-        </CartProvider>
+          </CartProvider>
       </AuthProvider>
     </ToastProvider>
+  </BrowserRouter>
   );
 }
 

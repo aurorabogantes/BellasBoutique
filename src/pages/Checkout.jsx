@@ -213,6 +213,34 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+      {showPreviewModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300 }}>
+          <div className="card" style={{ width: 560, maxWidth: '95vw' }}>
+            <h3 style={{ marginBottom: 8 }}>Vista previa - Correo de Confirmación</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Para: <strong>{user?.correo || 'cliente@ejemplo.com'}</strong></p>
+            <div style={{ marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: 6 }}>Dirección de entrega</label>
+              <input className="form-input" value={previewAddress} onChange={(e) => setPreviewAddress(e.target.value)} />
+            </div>
+            <div style={{ maxHeight: 160, overflowY: 'auto', background: 'var(--cream-100)', padding: 12, borderRadius: 6 }}>
+              <p style={{ fontWeight: 700 }}>Detalle de la factura</p>
+              {cartItems.map((c) => (
+                <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>{c.name} × {c.qty}</span>
+                  <span>{formatCRC(c.price * c.qty)}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: '1px solid var(--border)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                <span>Total</span><span>{formatCRC(total)}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+              <button className="btn btn-outline" onClick={() => setShowPreviewModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={handleFinalConfirm}>Confirmar y enviar correo</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
