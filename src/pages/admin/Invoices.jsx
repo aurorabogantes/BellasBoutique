@@ -58,7 +58,7 @@ export default function Invoices() {
         </div>
 
         <div className="card">
-          <div className="filters-bar">
+            <div className="filters-bar">
             <div className="search-wrapper">
               <span className="search-icon">🔍</span>
               <input
@@ -77,7 +77,24 @@ export default function Invoices() {
             >
               {orderStatuses.map((s) => <option key={s}>{s}</option>)}
             </select>
-            <button className="btn btn-primary btn-sm">📄 Generar Reporte</button>
+            <button className="btn btn-primary btn-sm" onClick={() => {
+              // export filtered invoices as CSV
+              const rows = [['Factura','Cliente','Producto','Cantidad','Total','Fecha','Estado']];
+              filtered.forEach(inv => rows.push([inv.id, inv.cliente, inv.producto, inv.cantidad, inv.total, inv.fecha, inv.estado]));
+              const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a'); a.href = url; a.download = `invoices_export.csv`; a.click(); URL.revokeObjectURL(url);
+            }}>📄 Generar Reporte</button>
+            <button className="btn btn-outline btn-sm" onClick={() => {
+              // export all filtered as CSV (alias)
+              const rows = [['Factura','Cliente','Producto','Cantidad','Total','Fecha','Estado']];
+              filtered.forEach(inv => rows.push([inv.id, inv.cliente, inv.producto, inv.cantidad, inv.total, inv.fecha, inv.estado]));
+              const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a'); a.href = url; a.download = `invoices_list.csv`; a.click(); URL.revokeObjectURL(url);
+            }}>⬇️ Exportar CSV</button>
           </div>
 
           <div className="table-wrapper">

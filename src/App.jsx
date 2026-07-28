@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import ToastProvider from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
@@ -27,8 +28,9 @@ import Emails from './pages/admin/Emails';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
         <BrowserRouter>
           <Routes>
           {/* Public / Client */}
@@ -57,8 +59,9 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
-      </CartProvider>
-    </AuthProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

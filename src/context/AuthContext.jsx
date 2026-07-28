@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { users as mockUsers, invoices as mockInvoices, products as mockProducts } from '../data/mockData';
 
 export const AuthContext = createContext();
@@ -77,7 +78,16 @@ export function AuthProvider({ children }) {
 
   const login = ({ correo, password }) => {
     // Basic validation
-    if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) return { ok: false, error: 'Correo inválido' };
+    if (!correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
+      // record failed attempt
+      setActivityLog((prev) => {
+        const entry = { id: Date.now(), user: { correo }, action: 'Login fallido', meta: { reason: 'Correo inválido' }, ts: new Date().toISOString() };
+        const next = [entry, ...prev];
+        localStorage.setItem(ACT_LOG_KEY, JSON.stringify(next));
+        return next;
+      });
+      return { ok: false, error: 'Correo inválido' };
+    }
 
     // try to find user in mock users
     const found = mockUsers.find((u) => u.correo.toLowerCase() === correo.toLowerCase());

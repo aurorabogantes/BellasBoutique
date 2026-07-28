@@ -1,6 +1,7 @@
 import { createContext, useState, useContext } from 'react';
 import { products as catalogProducts } from '../data/mockData';
 import { AuthContext } from './AuthContext';
+import { ToastContext } from './ToastContext';
 
 export const CartContext = createContext();
 
@@ -13,6 +14,7 @@ export function CartProvider({ children }) {
   ]);
 
   const authCtx = useContext(AuthContext);
+  const { showToast } = useContext(ToastContext);
 
   const addToCart = (product) => {
     const existing = cartItems.find((i) => i.id === product.id);
@@ -20,7 +22,7 @@ export function CartProvider({ children }) {
     const currentQty = existing ? existing.qty : 0;
     if (currentQty + 1 > (catalogItem.stock || 9999)) {
       // cannot add beyond stock
-      alert('Stock insuficiente para este producto.');
+      if (showToast) showToast('Stock insuficiente para este producto.', { duration: 4000 });
       try { if (authCtx && authCtx.addActivity) authCtx.addActivity('Intento añadir al carrito - stock insuficiente', { productId: product.id }); } catch {}
       return false;
     }

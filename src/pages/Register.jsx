@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ToastContext } from '../context/ToastContext';
 
 const validate = (password) => ({
   upper: /[A-Z]/.test(password),
@@ -22,13 +23,16 @@ export default function Register() {
   const checks = validate(form.password);
   const { addActivity } = useContext(AuthContext);
 
+  const { showToast } = useContext(ToastContext);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // basic validations
-    if (!form.correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.correo)) return alert('Correo inválido');
-    if (form.password.length < 8) return alert('Contraseña demasiado corta');
-    if (form.password !== form.confirm) return alert('Las contraseñas no coinciden');
+    if (!form.correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.correo)) return showToast?.('Correo inválido', { duration: 3500 });
+    if (form.password.length < 8) return showToast?.('Contraseña demasiado corta', { duration: 3500 });
+    if (form.password !== form.confirm) return showToast?.('Las contraseñas no coinciden', { duration: 3500 });
     if (addActivity) addActivity('Registro de usuario', { correo: form.correo, nombre: form.nombre });
+    showToast?.('Cuenta creada. Inicia sesión.', { duration: 3000 });
     navigate('/');
   };
 

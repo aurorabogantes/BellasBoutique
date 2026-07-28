@@ -99,8 +99,20 @@ export default function InvoiceDetail() {
               ← Regresar
             </button>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-outline btn-sm">🖨️ Imprimir</button>
-              <button className="btn btn-primary btn-sm">⬇️ Descargar PDF</button>
+              <button className="btn btn-outline btn-sm" onClick={() => window.print()}>🖨️ Imprimir</button>
+              <button className="btn btn-primary btn-sm" onClick={() => {
+                // export invoice as CSV
+                const rows = [['Producto','Cantidad','Precio Unitario','Total']];
+                inv.items.forEach(it => rows.push([it.producto, it.cantidad, it.precioUnitario, it.total]));
+                rows.push([]);
+                rows.push(['Subtotal', formatCRC(subtotal)]);
+                rows.push(['IVA', formatCRC(iva)]);
+                rows.push(['Total', formatCRC(total)]);
+                const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `${inv.id}.csv`; a.click(); URL.revokeObjectURL(url);
+              }}>⬇️ Descargar CSV</button>
             </div>
           </div>
         </div>
