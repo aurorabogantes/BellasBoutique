@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import { users as initialUsers, roles } from '../../data/mockData';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function Users() {
   const [users, setUsers] = useState(initialUsers);
@@ -15,11 +16,17 @@ export default function Users() {
     return matchRole && matchSearch;
   });
 
-  const setRole = (id, rol) =>
-    setUsers(users.map((u) => (u.id === id ? { ...u, rol } : u)));
+  const { addActivity } = useContext(AuthContext);
 
-  const setEstado = (id, estado) =>
+  const setRole = (id, rol) => {
+    setUsers(users.map((u) => (u.id === id ? { ...u, rol } : u)));
+    if (addActivity) addActivity('Cambio de rol', { id, rol });
+  };
+
+  const setEstado = (id, estado) => {
     setUsers(users.map((u) => (u.id === id ? { ...u, estado } : u)));
+    if (addActivity) addActivity('Cambio de estado usuario', { id, estado });
+  };
 
   return (
     <div className="admin-layout">

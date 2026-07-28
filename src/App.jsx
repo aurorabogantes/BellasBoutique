@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
 // Client pages
@@ -20,12 +22,15 @@ import Users from './pages/admin/Users';
 import Invoices from './pages/admin/Invoices';
 import InvoiceDetail from './pages/admin/InvoiceDetail';
 import Reports from './pages/admin/Reports';
+import Bitacora from './pages/admin/Bitacora';
+import Emails from './pages/admin/Emails';
 
 export default function App() {
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Routes>
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public / Client */}
           <Route path="/" element={<Login />} />
           <Route path="/registro" element={<Register />} />
@@ -38,19 +43,22 @@ export default function App() {
           <Route path="/perfil" element={<ClientProfile />} />
 
           {/* Admin */}
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/productos" element={<Products />} />
-          <Route path="/admin/usuarios" element={<Users />} />
-          <Route path="/admin/facturacion" element={<Invoices />} />
-          <Route path="/admin/ventas/:id" element={<InvoiceDetail />} />
-          <Route path="/admin/reportes" element={<Reports />} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute role="Administrador"><Dashboard /></ProtectedRoute>} />
+          <Route path="/admin/productos" element={<ProtectedRoute role="Administrador"><Products /></ProtectedRoute>} />
+          <Route path="/admin/usuarios" element={<ProtectedRoute role="Administrador"><Users /></ProtectedRoute>} />
+          <Route path="/admin/facturacion" element={<ProtectedRoute role="Administrador"><Invoices /></ProtectedRoute>} />
+          <Route path="/admin/ventas/:id" element={<ProtectedRoute role="Administrador"><InvoiceDetail /></ProtectedRoute>} />
+          <Route path="/admin/reportes" element={<ProtectedRoute role="Administrador"><Reports /></ProtectedRoute>} />
+          <Route path="/admin/bitacora" element={<ProtectedRoute role="Administrador"><Bitacora /></ProtectedRoute>} />
+          <Route path="/admin/emails" element={<ProtectedRoute role="Administrador"><Emails /></ProtectedRoute>} />
           <Route path="/admin/configuracion" element={<Navigate to="/admin/dashboard" replace />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </CartProvider>
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

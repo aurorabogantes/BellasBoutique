@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
 import { products as initialProducts, categories, formatCRC } from '../../data/mockData';
+import { AuthContext } from '../../context/AuthContext';
 
 const emptyProduct = { name: '', category: 'Ropa', supplier: '', priceUSD: '', stock: '' };
 
@@ -20,13 +21,24 @@ export default function Products() {
 
   const openAdd = () => { setEditing(null); setForm(emptyProduct); setShowModal(true); };
   const openEdit = (p) => { setEditing(p.id); setForm({ ...p }); setShowModal(true); };
-  const handleDelete = (id) => setProducts(products.filter((p) => p.id !== id));
+  
 
-  const handleSave = () => {
+  const { addActivity } = useContext(AuthContext);
+
+  // watch changes to products and log create/update/delete via specific handlers
+  const handleDeleteWithLog = (id) => {
+    setProducts(products.filter((p) => p.id !== id));
+    if (addActivity) addActivity('Eliminar producto', { id });
+  };
+
+  const handleSaveWithLog = () => {
     if (editing) {
       setProducts(products.map((p) => (p.id === editing ? { ...p, ...form } : p)));
+      if (addActivity) addActivity('Editar producto', { id: editing, name: form.name });
     } else {
-      setProducts([...products, { ...form, id: Date.now(), price: Math.round(form.priceUSD * 540) }]);
+      const newP = { ...form, id: Date.now(), price: Math.round(form.priceUSD * 540) };
+      setProducts([...products, newP]);
+      if (addActivity) addActivity('Crear producto', { id: newP.id, name: newP.name });
     }
     setShowModal(false);
   };
@@ -95,7 +107,7 @@ export default function Products() {
                       <div className="table-actions">
                         <button className="icon-btn view" title="Ver">👁️</button>
                         <button className="icon-btn edit" title="Editar" onClick={() => openEdit(p)}>✏️</button>
-                        <button className="icon-btn delete" title="Eliminar" onClick={() => handleDelete(p.id)}>🗑️</button>
+                        <button className="icon-btn delete" title="Eliminar" onClick={() => handleDeleteWithLog(p.id)}>🗑️</button>
                       </div>
                     </td>
                   </tr>
@@ -144,7 +156,7 @@ export default function Products() {
             </div>
             <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'flex-end' }}>
               <button className="btn btn-outline btn-sm" onClick={() => setShowModal(false)}>Cancelar</button>
-              <button className="btn btn-primary btn-sm" onClick={handleSave}>Guardar</button>
+              <button className="btn btn-primary btn-sm" onClick={handleSaveWithLog}>Guardar</button>
             </div>
           </div>
         </div>

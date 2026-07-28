@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import { reportStats, formatCRC } from '../../data/mockData';
+import { reportStats, formatCRC, products as catalogProducts } from '../../data/mockData';
+import { AuthContext } from '../../context/AuthContext';
 
 const statCards = (s) => [
   { label: 'Ventas Totales', value: s.ventasTotales, icon: '🧾' },
@@ -11,6 +12,8 @@ const statCards = (s) => [
 
 export default function Reports() {
   const s = reportStats;
+  const { invoices, addActivity } = useContext(AuthContext);
+  const [daily, setDaily] = useState(null);
   const maxVal = Math.max(...s.ventasPorMes.map((v) => v.ventas));
 
   const [startDate, setStartDate] = useState('');
@@ -70,6 +73,29 @@ export default function Reports() {
             </div>
           ))}
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+          <button className="btn btn-primary btn-sm" onClick={() => {
+            const sold = (invoices || []).reduce((acc, inv) => acc + (inv.items?.reduce((s,i)=>s+i.cantidad,0)||0), 0);
+            const ingresos = (invoices || []).reduce((acc, inv) => acc + (inv.total||0), 0);
+            const lowStock = catalogProducts.filter(p => p.stock <= 5).map(p => ({ name: p.name, stock: p.stock }));
+            const summary = { productosVendidos: sold, ingresos, lowStock };
+            setDaily(summary);
+            if (addActivity) addActivity('Generar reporte diario', summary);
+          }}>Generar reporte del día</button>
+        </div>
+
+        {daily && (
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ marginBottom: 8 }}>Reporte generado</h3>
+            <p>Cantidad de productos vendidos: <strong>{daily.productosVendidos}</strong></p>
+            <p>Ingresos por ventas: <strong>{formatCRC(daily.ingresos)}</strong></p>
+            <p>Productos con stock bajo:</p>
+            <ul>
+              {daily.lowStock.map((p) => <li key={p.name}>{p.name} — {p.stock} unidades</li>)}
+            </ul>
+          </div>
+        )}
 
         {/* Bar chart */}
         <div className="card">

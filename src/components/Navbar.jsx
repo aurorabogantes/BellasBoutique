@@ -1,7 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Navbar({ cartCount = 0 }) {
   const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
 
   return (
     <nav className="navbar">
@@ -27,6 +30,16 @@ export default function Navbar({ cartCount = 0 }) {
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
         <button className="navbar-icon" title="Perfil" onClick={() => navigate('/perfil')}>👤</button>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: '0.9rem' }}>{user.nombre || user.correo}</span>
+            <button className="btn btn-ghost btn-sm" onClick={() => logout()}>Cerrar sesión</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')}>Ingresar</button>
+          </div>
+        )}
       </div>
     </nav>
   );

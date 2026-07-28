@@ -1,18 +1,24 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [form, setForm] = useState({ email: '', password: '', remember: false });
+  const [error, setError] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (form.email.includes('admin') || form.email === '') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/catalogo');
+    const res = login({ correo: form.email, password: form.password });
+    if (!res.ok) {
+      setError(res.error || 'Error de login');
+      return;
     }
+    // redirect based on role inference
+    if (form.email.includes('admin')) navigate('/admin/dashboard');
+    else navigate('/catalogo');
   };
 
   return (
@@ -56,6 +62,7 @@ export default function Login() {
             </p>
 
             <form onSubmit={handleSubmit} className="login-form">
+              {error && <p style={{ color: 'var(--danger)', fontWeight: 700 }}>{error}</p>}
               <div className="form-group">
                 <label>Correo electrónico</label>
                 <input

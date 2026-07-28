@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 const validate = (password) => ({
   upper: /[A-Z]/.test(password),
@@ -18,9 +20,15 @@ export default function Register() {
   });
 
   const checks = validate(form.password);
+  const { addActivity } = useContext(AuthContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // basic validations
+    if (!form.correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.correo)) return alert('Correo inválido');
+    if (form.password.length < 8) return alert('Contraseña demasiado corta');
+    if (form.password !== form.confirm) return alert('Las contraseñas no coinciden');
+    if (addActivity) addActivity('Registro de usuario', { correo: form.correo, nombre: form.nombre });
     navigate('/');
   };
 
