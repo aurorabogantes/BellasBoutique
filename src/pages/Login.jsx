@@ -44,7 +44,7 @@ export default function Login() {
         {/* Hero */}
         <div className="login-hero">
           <img
-            src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=80"
+            src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1200"
             alt="Fashion"
             className="login-hero-img"
           />

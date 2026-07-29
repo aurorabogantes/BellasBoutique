@@ -8,7 +8,7 @@ export const products = [
     price: 20000,
     priceUSD: 39.99,
     stock: 15,
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&q=80',
+    image: 'https://i.pinimg.com/originals/f9/cb/d2/f9cbd28d2ec9e1c6a9b143b28855531d.jpg',
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ export const products = [
     price: 15000,
     priceUSD: 69.99,
     stock: 8,
-    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80',
+    image: 'https://heraldodemexico.com.mx/u/fotografias/m/2023/8/9/f768x1-781377_781504_141.jpeg',
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ export const products = [
     price: 12000,
     priceUSD: 49.99,
     stock: 20,
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80',
+    image: 'https://i.pinimg.com/736x/69/d7/22/69d722d923e3c8e011dbd884c03f8dc0.jpg',
   },
   {
     id: 4,
@@ -38,7 +38,7 @@ export const products = [
     price: 24500,
     priceUSD: 59.99,
     stock: 11,
-    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80',
+    image: 'https://images-na.ssl-images-amazon.com/images/I/510PHH-eJqL._AC_UL200_SR200,200_.jpg',
   },
 ];
 
