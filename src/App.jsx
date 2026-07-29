@@ -33,6 +33,9 @@ import MensajesChatAdmin from './pages/admin/MensajesChat';
 import SugerenciasAdmin from './pages/admin/Sugerencias';
 // Vendor pages
 import VendorDashboard from './pages/vendor/Dashboard';
+import VendorProducts from './pages/vendor/Products';
+import VendorSales from './pages/vendor/Sales';
+import VendorInvoices from './pages/vendor/Invoices';
 
 export default function App() {
   return (
@@ -59,7 +62,9 @@ export default function App() {
           <Route path="/admin/productos" element={<ProtectedRoute role={["Administrador","Vendedor"]}><Products /></ProtectedRoute>} />
           {/* Vendor routes */}
           <Route path="/vendor/dashboard" element={<ProtectedRoute role="Vendedor"><VendorDashboard /></ProtectedRoute>} />
-          <Route path="/vendor/productos" element={<ProtectedRoute role={['Vendedor','Administrador']}><Products /></ProtectedRoute>} />
+          <Route path="/vendor/productos" element={<ProtectedRoute role="Vendedor"><VendorProducts /></ProtectedRoute>} />
+          <Route path="/vendor/ventas" element={<ProtectedRoute role="Vendedor"><VendorSales /></ProtectedRoute>} />
+          <Route path="/vendor/facturas" element={<ProtectedRoute role="Vendedor"><VendorInvoices /></ProtectedRoute>} />
           <Route path="/admin/usuarios" element={<ProtectedRoute role="Administrador"><Users /></ProtectedRoute>} />
           <Route path="/admin/facturacion" element={<ProtectedRoute role="Administrador"><Invoices /></ProtectedRoute>} />
           <Route path="/admin/ventas/:id" element={<ProtectedRoute role="Administrador"><InvoiceDetail /></ProtectedRoute>} />
