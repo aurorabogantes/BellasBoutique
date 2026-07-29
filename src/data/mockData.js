@@ -88,6 +88,17 @@ export const users = [
     estado: 'Inactivo',
     password: '••••••••',
   },
+  {
+    id: 1005,
+    nombre: 'Luis',
+    apellidos: 'Gómez',
+    correo: 'luis.vendedor@bellasboutique.com',
+    telefono: '4444-4444',
+    direccion: 'Puntarenas, Costa Rica',
+    rol: 'Vendedor',
+    estado: 'Activo',
+    password: '••••••••',
+  },
 ];
 
 // ── Invoices ──────────────────────────────────────────────────────────────────

@@ -80,6 +80,16 @@ export default function ClientProfile() {
             </div>
           </form>
 
+            {/* Quick access for roles */}
+            <div style={{ marginTop: 18, display: 'flex', gap: 8 }}>
+              {user?.rol === 'Vendedor' && (
+                <button className="btn btn-outline" onClick={() => window.location.href = '/vendor/dashboard'}>Ir al Panel de Vendedor</button>
+              )}
+              {user?.rol === 'Administrador' && (
+                <button className="btn btn-outline" onClick={() => window.location.href = '/admin/dashboard'}>Ir al Panel de Administrador</button>
+              )}
+            </div>
+
           {/* Info notice */}
           <div style={{
             marginTop: 20,

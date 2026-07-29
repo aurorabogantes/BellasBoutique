@@ -172,8 +172,6 @@ export function AuthProvider({ children }) {
       });
       return { ok: false, error: 'Correo inválido' };
     }
-
-    // find user in users list
     const found = (users || []).find((u) => u.correo.toLowerCase() === correo.toLowerCase());
     if (!found) {
       setActivityLog((prev) => {
@@ -197,14 +195,33 @@ export function AuthProvider({ children }) {
     }
 
     const hashed = await hashPassword(password);
-    if (hashed !== found.passwordHash) {
-      setActivityLog((prev) => {
-        const entry = { id: Date.now(), user: { correo }, action: 'Login fallido', meta: { reason: 'Contraseña incorrecta' }, ts: new Date().toISOString() };
-        const next = [entry, ...prev];
-        localStorage.setItem(ACT_LOG_KEY, JSON.stringify(next));
-        return next;
-      });
-      return { ok: false, error: 'Credenciales inválidas' };
+    // support mock/legacy users: if a plain `password` exists in the user object
+    // or the placeholder '••••••••' is used, allow `Password123!` as default
+    const mockPlaceholder = '••••••••';
+    const defaultMockPassword = 'Password123!';
+    const providedMatchesPlain = found.password && found.password !== mockPlaceholder && found.password === password;
+    const providedMatchesDefaultMock = found.password === mockPlaceholder && password === defaultMockPassword;
+
+    if (!found.passwordHash) {
+      if (!providedMatchesPlain && !providedMatchesDefaultMock) {
+        setActivityLog((prev) => {
+          const entry = { id: Date.now(), user: { correo }, action: 'Login fallido', meta: { reason: 'Contraseña incorrecta' }, ts: new Date().toISOString() };
+          const next = [entry, ...prev];
+          localStorage.setItem(ACT_LOG_KEY, JSON.stringify(next));
+          return next;
+        });
+        return { ok: false, error: 'Credenciales inválidas' };
+      }
+    } else {
+      if (hashed !== found.passwordHash) {
+        setActivityLog((prev) => {
+          const entry = { id: Date.now(), user: { correo }, action: 'Login fallido', meta: { reason: 'Contraseña incorrecta' }, ts: new Date().toISOString() };
+          const next = [entry, ...prev];
+          localStorage.setItem(ACT_LOG_KEY, JSON.stringify(next));
+          return next;
+        });
+        return { ok: false, error: 'Credenciales inválidas' };
+      }
     }
 
     const u = { ...found };
@@ -228,7 +245,7 @@ export function AuthProvider({ children }) {
       correo: data.correo,
       telefono: data.telefono || '',
       direccion: data.direccion || '',
-      rol: data.rol || 'Cliente',
+      rol: 'Cliente',
       estado: 'Activo',
       cedula: data.cedula || '',
       passwordHash: h,

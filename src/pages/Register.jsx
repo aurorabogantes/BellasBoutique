@@ -15,8 +15,8 @@ const validate = (password) => ({
 export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    id: '', cedula: '', nombre: '', apellidos: '',
-    correo: '', telefono: '', rol: '', direccion: '',
+    cedula: '', nombre: '', apellidos: '',
+    correo: '', telefono: '', direccion: '',
     password: '', confirm: '',
   });
 
@@ -36,7 +36,7 @@ export default function Register() {
     const okNumber = /[0-9]/.test(form.password);
     const okSpecial = /[^A-Za-z0-9]/.test(form.password);
     if (!(okUpper && okLower && okNumber && okSpecial && form.password.length >= 8)) return showToast?.('La contraseña debe tener mayúscula, minúscula, número y carácter especial', { duration: 4500 });
-    const res = await register({ nombre: form.nombre, apellidos: form.apellidos, correo: form.correo, password: form.password, telefono: form.telefono, direccion: form.direccion, cedula: form.cedula, rol: form.rol });
+    const res = await register({ nombre: form.nombre, apellidos: form.apellidos, correo: form.correo, password: form.password, telefono: form.telefono, direccion: form.direccion, cedula: form.cedula });
     if (!res.ok) { showToast?.(res.error || 'Error', { duration: 3500 }); return; }
     showToast?.('Cuenta creada. Inicia sesión.', { duration: 3000 });
     navigate('/');
@@ -66,7 +66,6 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div className="form-group">{field('id', 'ID')}</div>
               <div className="form-group">{field('cedula', 'Cédula')}</div>
               <div className="form-group">{field('nombre', 'Nombre')}</div>
               <div className="form-group">{field('apellidos', 'Apellidos')}</div>
@@ -74,20 +73,8 @@ export default function Register() {
 
             <div className="form-group">{field('correo', 'Correo electrónico', 'email')}</div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
               <div className="form-group">{field('telefono', 'Teléfono')}</div>
-              <div className="form-group">
-                <select
-                  className="form-input"
-                  value={form.rol}
-                  onChange={(e) => setForm({ ...form, rol: e.target.value })}
-                >
-                  <option value="">Seleccione un Rol</option>
-                  <option>Administrador</option>
-                  <option>Cliente</option>
-                  <option>Vendedor</option>
-                </select>
-              </div>
             </div>
 
             <div className="form-group">{field('direccion', 'Dirección')}</div>
