@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { AuthContext } from '../context/AuthContext';
@@ -10,6 +10,17 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '', remember: false });
   const [error, setError] = useState(null);
   const { showToast } = useContext(ToastContext);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem('bb_session_expired');
+      if (v) {
+        setSessionExpired(true);
+        localStorage.removeItem('bb_session_expired');
+      }
+    } catch {}
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +77,11 @@ export default function Login() {
             </p>
 
             <form onSubmit={handleSubmit} className="login-form">
+              {sessionExpired && (
+                <div style={{ background: '#fff4e5', border: '1px solid #ffd8a8', padding: 12, borderRadius: 6, marginBottom: 12, color: '#663c00', fontWeight: 700 }}>
+                  Su sesión expiró por inactividad. Por favor inicie sesión nuevamente.
+                </div>
+              )}
               {error && <p style={{ color: 'var(--danger)', fontWeight: 700 }}>{error}</p>}
               <div className="form-group">
                 <label>Correo electrónico</label>

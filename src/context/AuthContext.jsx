@@ -1,6 +1,7 @@
-import React, { createContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useEffect, useState, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { users as mockUsers, invoices as mockInvoices, products as mockProducts } from '../data/mockData';
+import { ToastContext } from './ToastContext';
 
 export const AuthContext = createContext();
 
@@ -108,9 +109,10 @@ export function AuthProvider({ children }) {
     })();
   };
 
-  // Session timeout (5 minutes inactivity)
+  // Session timeout (default: 5 minutes)
   const TIMEOUT = 5 * 60 * 1000;
   const [lastActive, setLastActive] = useState(Date.now());
+  const { showToast } = useContext(ToastContext);
 
   const persist = useCallback(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
@@ -138,6 +140,8 @@ export function AuthProvider({ children }) {
     const id = setInterval(() => {
       if (Date.now() - lastActive > TIMEOUT) {
         // auto logout
+        try { showToast && showToast('Su sesión ha expirado por inactividad. Por favor inicie sesión nuevamente.'); } catch {}
+        try { localStorage.setItem('bb_session_expired', '1'); } catch {}
         addActivity('Auto-logout por inactividad');
         logout();
       }
