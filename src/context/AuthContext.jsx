@@ -322,6 +322,15 @@ export function AuthProvider({ children }) {
     addActivity('Compra realizada', { invoiceId: invoice.id, total: invoice.total });
   };
 
+  const updateInvoiceStatus = (id, status) => {
+    setInvoices((prev) => {
+      const next = prev.map((inv) => (inv.id === id ? { ...inv, estado: status } : inv));
+      try { localStorage.setItem(INVOICES_KEY, JSON.stringify(next)); } catch {}
+      addActivity('Actualizar estado factura', { id, status });
+      return next;
+    });
+  };
+
   const value = {
     user,
     login,
@@ -333,6 +342,7 @@ export function AuthProvider({ children }) {
     activityLog,
     invoices,
     recordInvoice,
+    updateInvoiceStatus,
     sendEmail,
     users,
   };

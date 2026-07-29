@@ -88,6 +88,7 @@ export default function ClientProfile() {
               {user?.rol === 'Administrador' && (
                 <button className="btn btn-outline" onClick={() => window.location.href = '/admin/dashboard'}>Ir al Panel de Administrador</button>
               )}
+              <button className="btn btn-outline" onClick={() => window.location.href = '/mis-facturas'}>Mis Facturas</button>
             </div>
 
           {/* Info notice */}

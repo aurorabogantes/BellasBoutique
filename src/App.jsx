@@ -16,6 +16,7 @@ import Support from './pages/Support';
 import Chat from './pages/Chat';
 import FAQ from './pages/FAQ';
 import ClientProfile from './pages/ClientProfile';
+import MyInvoices from './pages/MyInvoices';
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/encuesta-faq" element={<FAQ />} />
           <Route path="/perfil" element={<ClientProfile />} />
+          <Route path="/mis-facturas" element={<MyInvoices />} />
 
           {/* Admin */}
           <Route path="/admin/dashboard" element={<ProtectedRoute role="Administrador"><Dashboard /></ProtectedRoute>} />

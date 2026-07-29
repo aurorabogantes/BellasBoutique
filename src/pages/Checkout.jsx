@@ -11,7 +11,7 @@ const today = new Date().toLocaleDateString('es-CR', { day: '2-digit', month: '2
 export default function Checkout() {
   const navigate = useNavigate();
   const { cartItems, clearCart } = useContext(CartContext);
-  const { user, recordInvoice, sendEmail } = useContext(AuthContext);
+  const { user, recordInvoice, sendEmail, addActivity, updateInvoiceStatus } = useContext(AuthContext);
   const [method, setMethod] = useState('Tarjeta');
   const [confirmed, setConfirmed] = useState(false);
   const [sentEmail, setSentEmail] = useState(null);
@@ -31,24 +31,90 @@ export default function Checkout() {
   };
 
   const handleFinalConfirm = () => {
-    // create invoice and send
+    // create invoice object (status will be decided by payment simulation)
     const invoice = {
       id: 'F' + Date.now(),
       cliente: (user && (user.nombre || user.correo)) || 'Cliente',
       items: cartItems.map((c) => ({ producto: c.name, cantidad: c.qty, precioUnitario: c.price, total: c.price * c.qty })),
       total,
       fecha: today,
-      estado: 'Pagado',
+      estado: 'Pendiente',
       metodo: method,
       direccion: previewAddress,
     };
-    recordInvoice(invoice);
-    const emailBody = `Factura ${invoice.id}\nCliente: ${invoice.cliente}\nTotal: ${formatCRC(invoice.total)}\nDirección: ${invoice.direccion}`;
-    const emailObj = sendEmail(user?.correo || 'cliente@ejemplo.com', `Confirmación de Compra ${invoice.id}`, emailBody);
+
+    // simulate payment gateway
+    const simulatePayment = async (method) => {
+      // small delay to mimic network
+      await new Promise((r) => setTimeout(r, 600));
+      const rnd = Math.random();
+      if (method === 'Tarjeta') {
+        if (rnd < 0.8) return 'success';
+        if (rnd < 0.95) return 'pending';
+        return 'failed';
+      }
+      if (method === 'SINPE') {
+        if (rnd < 0.9) return 'success';
+        return 'failed';
+      }
+      // Transferencia tends to be pending
+      if (method === 'Transferencia') {
+        if (rnd < 0.25) return 'success';
+        return 'pending';
+      }
+      return 'failed';
+    };
+
+    (async () => {
+      const result = await simulatePayment(method);
+      if (result === 'success') {
+        invoice.estado = 'Pagado';
+        recordInvoice(invoice);
+        const emailBody = `Factura ${invoice.id}\nCliente: ${invoice.cliente}\nTotal: ${formatCRC(invoice.total)}\nDirección: ${invoice.direccion}`;
+        const emailObj = sendEmail(user?.correo || 'cliente@ejemplo.com', `Confirmación de Compra ${invoice.id}`, emailBody);
+        setSentEmail(emailObj);
+        setConfirmed(true);
+        setShowEmailModal(true);
+        setShowPreviewModal(false);
+        clearCart();
+      } else if (result === 'failed') {
+        invoice.estado = 'Fallido';
+        recordInvoice(invoice);
+        addActivity && addActivity('Pago fallido', { invoiceId: invoice.id, metodo: method });
+        setShowPreviewModal(false);
+        // show a simple alert / toast
+        try { window.alert('El pago ha fallado. Por favor, intente nuevamente.'); } catch {}
+      } else {
+        // pending
+        invoice.estado = 'Pendiente';
+        recordInvoice(invoice);
+        addActivity && addActivity('Pago pendiente', { invoiceId: invoice.id, metodo: method });
+        setShowPreviewModal(false);
+        // show pending screen with option to simulate completion
+        setConfirmed(false);
+        setShowEmailModal(false);
+        // show an information modal by reusing the preview modal state
+        setShowPreviewModal(false);
+        // store pending id in local state to allow simulation
+        setPendingInvoiceId(invoice.id);
+        setPendingInvoice(invoice);
+      }
+    })();
+  };
+
+  const [pendingInvoiceId, setPendingInvoiceId] = useState(null);
+  const [pendingInvoice, setPendingInvoice] = useState(null);
+
+  const simulateCompletePending = () => {
+    if (!pendingInvoiceId) return;
+    // update status via context
+    updateInvoiceStatus && updateInvoiceStatus(pendingInvoiceId, 'Pagado');
+    const updated = { ...pendingInvoice, estado: 'Pagado' };
+    const emailObj = sendEmail(user?.correo || 'cliente@ejemplo.com', `Confirmación de Compra ${pendingInvoiceId}`, `Factura ${pendingInvoiceId}\nCliente: ${updated.cliente}\nTotal: ${formatCRC(updated.total)}\nDirección: ${updated.direccion}`);
     setSentEmail(emailObj);
     setConfirmed(true);
-    setShowEmailModal(true);
-    setShowPreviewModal(false);
+    setPendingInvoiceId(null);
+    setPendingInvoice(null);
     clearCart();
   };
 
@@ -112,6 +178,28 @@ export default function Checkout() {
             </div>
           </div>
         )}
+      </>
+    );
+  }
+
+  if (pendingInvoiceId) {
+    return (
+      <>
+        <Navbar />
+        <div className="page-container" style={{ maxWidth: 600, textAlign: 'center' }}>
+          <div className="card">
+            <div style={{ fontSize: '3rem', marginBottom: 16 }}>⏳</div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>Pago Pendiente</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
+              Su pago está en estado <strong>Pendiente</strong>. Cuando se confirme, recibirá la factura por correo.
+            </p>
+            <p style={{ fontSize: '0.9rem' }}>ID de la transacción: <strong>{pendingInvoiceId}</strong></p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 18 }}>
+              <button className="btn btn-primary" onClick={simulateCompletePending}>Simular pago completado</button>
+              <button className="btn btn-outline" onClick={() => navigate('/catalogo')}>Volver al catálogo</button>
+            </div>
+          </div>
+        </div>
       </>
     );
   }
