@@ -14,6 +14,8 @@ export default function Navbar({ cartCount = 0 }) {
           <li><Link to="/catalogo?cat=Ropa">Mujer</Link></li>
           <li><Link to="/catalogo?cat=Calzado">Calzado</Link></li>
           <li><Link to="/catalogo?cat=Accesorios">Accesorios</Link></li>
+          <li><Link to="/soporte">Soporte</Link></li>
+          <li><Link to="/encuesta-faq">Preguntas</Link></li>
         </ul>
       </div>
 
@@ -24,6 +26,7 @@ export default function Navbar({ cartCount = 0 }) {
 
       <div className="navbar-actions">
         <button className="navbar-icon" title="Buscar">🔍</button>
+        <button className="navbar-icon" title="Chat" onClick={() => navigate('/chat')}>💬</button>
         <button className="navbar-icon" title="Favoritos">🤍</button>
         <button className="navbar-icon" title="Carrito" onClick={() => navigate('/carrito')}>
           🛒
@@ -32,6 +35,9 @@ export default function Navbar({ cartCount = 0 }) {
         <button className="navbar-icon" title="Perfil" onClick={() => navigate('/perfil')}>👤</button>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {user.rol === 'Vendedor' && (
+              <button className="btn btn-outline btn-sm" onClick={() => navigate('/vendor/dashboard')}>Panel Vendedor</button>
+            )}
             <span style={{ fontSize: '0.9rem' }}>{user.nombre || user.correo}</span>
             <button className="btn btn-ghost btn-sm" onClick={() => logout()}>Cerrar sesión</button>
           </div>

@@ -18,9 +18,11 @@ export default function VendorProducts() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyProduct);
   const filtered = products.filter((p) => {
+    // show products owned by this vendor or unassigned
+    const owned = !p.ownerId || p.ownerId === user?.id;
     const matchCat = category === 'Todas las categorías' || p.category === category;
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
+    return owned && matchCat && matchSearch;
   });
   const { addActivity, user } = useContext(AuthContext);
 
@@ -33,7 +35,7 @@ export default function VendorProducts() {
       setProducts(products.map((p) => (p.id === editing ? { ...p, ...form } : p)));
       if (addActivity) addActivity('Vendedor editar producto', { id: editing, name: form.name });
     } else {
-      const newP = { ...form, id: Date.now(), price: Math.round(form.priceUSD * 540) };
+      const newP = { ...form, id: Date.now(), price: Math.round(form.priceUSD * 540), ownerId: user?.id };
       setProducts([...products, newP]);
       if (addActivity) addActivity('Vendedor crear producto', { id: newP.id, name: newP.name });
     }
