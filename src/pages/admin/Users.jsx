@@ -1,14 +1,15 @@
 import { useState, useContext } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import { users as initialUsers, roles } from '../../data/mockData';
+import { roles } from '../../data/mockData';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function Users() {
-  const [users, setUsers] = useState(initialUsers);
+  const { users, updateUser } = useContext(AuthContext);
+  const [usersState, setUsersState] = useState(users || []);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('Todos los roles');
 
-  const filtered = users.filter((u) => {
+  const filtered = usersState.filter((u) => {
     const matchRole = roleFilter === 'Todos los roles' || u.rol === roleFilter;
     const matchSearch =
       u.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -19,12 +20,14 @@ export default function Users() {
   const { addActivity } = useContext(AuthContext);
 
   const setRole = (id, rol) => {
-    setUsers(users.map((u) => (u.id === id ? { ...u, rol } : u)));
+    setUsersState((prev) => prev.map((u) => (u.id === id ? { ...u, rol } : u)));
+    if (updateUser) updateUser(id, { rol });
     if (addActivity) addActivity('Cambio de rol', { id, rol });
   };
 
   const setEstado = (id, estado) => {
-    setUsers(users.map((u) => (u.id === id ? { ...u, estado } : u)));
+    setUsersState((prev) => prev.map((u) => (u.id === id ? { ...u, estado } : u)));
+    if (updateUser) updateUser(id, { estado });
     if (addActivity) addActivity('Cambio de estado usuario', { id, estado });
   };
 

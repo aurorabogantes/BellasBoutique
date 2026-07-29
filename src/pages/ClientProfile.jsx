@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import Navbar from '../components/Navbar';
-import { currentClient } from '../data/mockData';
+import { AuthContext } from '../context/AuthContext';
+import { ToastContext } from '../context/ToastContext';
 
 export default function ClientProfile() {
-  const [profile, setProfile] = useState({ ...currentClient, password: '' });
+  const { user, updateUser } = useContext(AuthContext);
+  const { showToast } = useContext(ToastContext);
+  const [profile, setProfile] = useState({ ...(user || {}), password: '' });
   const [saved, setSaved] = useState(false);
 
   const field = (key, label, type = 'text', disabled = false) => (
@@ -40,7 +43,15 @@ export default function ClientProfile() {
           </div>
 
           <form
-            onSubmit={(e) => { e.preventDefault(); setSaved(true); setTimeout(() => setSaved(false), 3000); }}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              // prepare fields to update
+              const fields = { nombre: profile.nombre, apellidos: profile.apellidos, direccion: profile.direccion, telefono: profile.telefono };
+              if (profile.password && profile.password.length > 0) fields.password = profile.password;
+              if (updateUser && user) await updateUser(user.id, fields);
+              setSaved(true); setTimeout(() => setSaved(false), 3000);
+              showToast?.('Perfil actualizado', { duration: 3000 });
+            }}
             style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
           >
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

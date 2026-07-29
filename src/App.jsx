@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import ToastProvider from './context/ToastContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
@@ -25,11 +26,14 @@ import InvoiceDetail from './pages/admin/InvoiceDetail';
 import Reports from './pages/admin/Reports';
 import Bitacora from './pages/admin/Bitacora';
 import Emails from './pages/admin/Emails';
+import IntentosLogin from './pages/admin/IntentosLogin';
+import Surveys from './pages/admin/Surveys';
 
 export default function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
+        <ConfirmProvider>
         <AuthProvider>
           <CartProvider>
           <Routes>
@@ -52,7 +56,9 @@ export default function App() {
           <Route path="/admin/ventas/:id" element={<ProtectedRoute role="Administrador"><InvoiceDetail /></ProtectedRoute>} />
           <Route path="/admin/reportes" element={<ProtectedRoute role="Administrador"><Reports /></ProtectedRoute>} />
           <Route path="/admin/bitacora" element={<ProtectedRoute role="Administrador"><Bitacora /></ProtectedRoute>} />
+          <Route path="/admin/intentolog" element={<ProtectedRoute role="Administrador"><IntentosLogin /></ProtectedRoute>} />
           <Route path="/admin/emails" element={<ProtectedRoute role="Administrador"><Emails /></ProtectedRoute>} />
+          <Route path="/admin/encuestas" element={<ProtectedRoute role="Administrador"><Surveys /></ProtectedRoute>} />
           <Route path="/admin/configuracion" element={<Navigate to="/admin/dashboard" replace />} />
 
           {/* Fallback */}
@@ -60,6 +66,7 @@ export default function App() {
           </Routes>
           </CartProvider>
       </AuthProvider>
+        </ConfirmProvider>
     </ToastProvider>
   </BrowserRouter>
   );

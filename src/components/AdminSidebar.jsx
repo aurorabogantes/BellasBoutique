@@ -9,7 +9,9 @@ const navItems = [
   { to: '/admin/facturacion', label: 'Ventas', icon: '🧾' },
   { to: '/admin/reportes', label: 'Reportes', icon: '📈' },
    { to: '/admin/bitacora', label: 'Bitácora', icon: '📚' },
+   { to: '/admin/intentolog', label: 'Intentos Login', icon: '🔐' },
    { to: '/admin/emails', label: 'Correos', icon: '✉️' },
+   { to: '/admin/encuestas', label: 'Encuestas/Sugerencias', icon: '📝' },
   { to: '/admin/configuracion', label: 'Configuración', icon: '⚙️' },
 ];
 

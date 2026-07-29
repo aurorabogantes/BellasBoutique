@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { chatMessages } from '../data/mockData';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Chat() {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState(chatMessages);
+  const { addActivity } = useContext(AuthContext);
+  const [messages, setMessages] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('bb_chat_messages')) || chatMessages; } catch { return chatMessages; }
+  });
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    try { localStorage.setItem('bb_chat_messages', JSON.stringify(messages)); } catch {}
+  }, [messages]);
 
   const send = () => {
     if (!input.trim()) return;
@@ -18,6 +26,7 @@ export default function Chat() {
     };
     setMessages([...messages, newMsg]);
     setInput('');
+    if (addActivity) addActivity('Enviar mensaje chat', { text: newMsg.text });
     // Auto-reply
     setTimeout(() => {
       setMessages((prev) => [

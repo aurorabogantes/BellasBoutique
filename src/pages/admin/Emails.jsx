@@ -1,5 +1,6 @@
 import AdminSidebar from '../../components/AdminSidebar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { ConfirmContext } from '../../context/ConfirmContext';
 
 export default function Emails() {
   const [emails, setEmails] = useState([]);
@@ -11,8 +12,11 @@ export default function Emails() {
     } catch { setEmails([]); }
   }, []);
 
-  const clearAll = () => {
-    if (!confirm('Eliminar todos los correos simulados?')) return;
+  const { confirm } = useContext(ConfirmContext);
+
+  const clearAll = async () => {
+    const ok = await confirm('Eliminar todos los correos simulados?');
+    if (!ok) return;
     localStorage.removeItem('bb_sent_emails');
     setEmails([]);
   };

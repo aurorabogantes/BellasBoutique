@@ -3,17 +3,21 @@
 import puppeteer from 'puppeteer';
 
 async function run() {
-  const url = process.env.URL || 'http://localhost:5173/';
-  const browser = await puppeteer.launch({ headless: true });
+  const url = process.env.URL || 'http://localhost:5174/';
+  const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
   const page = await browser.newPage();
-  page.setDefaultTimeout(20000);
+  await page.setViewport({ width: 1280, height: 800 });
+  page.setDefaultTimeout(60000);
   try {
-    await page.goto(url);
-    console.log('Opened', url);
+    // ensure a clean state by loading the app and clearing its localStorage then reloading
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    try { await page.evaluate(() => localStorage.clear()); } catch (err) { /* ignore */ }
+    await page.reload({ waitUntil: 'networkidle0' });
+    console.log('Opened', url, '(clean state)');
     // try login as client
-    await page.waitForSelector('input[type=email]');
-    await page.type('input[type=email]', 'cliente@example.com');
-    await page.type('input[type=password]', 'password');
+    await page.waitForSelector('input.form-input[type=email]', { timeout: 40000 });
+    await page.type('input.form-input[type=email]', 'ana@bellasboutique.com');
+    await page.type('input.form-input[type=password]', 'Password123!');
     await page.click('button[type=submit]');
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
     console.log('Logged in, current url:', page.url());

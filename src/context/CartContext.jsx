@@ -6,14 +6,24 @@ import { ToastContext } from './ToastContext';
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([
-    // Seed with mock data matching Figma design
-    { id: 1, name: 'Vestido Elegante', category: 'Ropa', price: 20000, qty: 1 },
-    { id: 2, name: 'Tacones Nude', category: 'Calzado', price: 15000, qty: 2 },
-    { id: 3, name: 'Bolso Beige', category: 'Accesorios', price: 12000, qty: 1 },
-  ]);
-
   const authCtx = useContext(AuthContext);
+  const { user } = authCtx;
+
+  const initialCart = () => {
+    try {
+      const key = user ? `bb_cart_${user.id}` : 'bb_cart_anon';
+      const saved = JSON.parse(localStorage.getItem(key));
+      if (saved && Array.isArray(saved)) return saved;
+    } catch {}
+    return [
+      { id: 1, name: 'Vestido Elegante', category: 'Ropa', price: 20000, qty: 1 },
+      { id: 2, name: 'Tacones Nude', category: 'Calzado', price: 15000, qty: 2 },
+      { id: 3, name: 'Bolso Beige', category: 'Accesorios', price: 12000, qty: 1 },
+    ];
+  };
+
+  const [cartItems, setCartItems] = useState(initialCart);
+
   const { showToast } = useContext(ToastContext);
 
   const addToCart = (product) => {
@@ -61,6 +71,14 @@ export function CartProvider({ children }) {
   const clearCart = () => setCartItems([]);
 
   const clearCartLogged = () => { try { if (authCtx && authCtx.addActivity) authCtx.addActivity('Vaciar carrito'); } catch {} ; setCartItems([]); };
+
+  // persist cart per user
+  useEffect(() => {
+    try {
+      const key = user ? `bb_cart_${user.id}` : 'bb_cart_anon';
+      localStorage.setItem(key, JSON.stringify(cartItems));
+    } catch {}
+  }, [cartItems, user]);
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart: addToCartLogged, updateQty, removeFromCart, clearCart: clearCartLogged }}>

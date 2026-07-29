@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminSidebar';
 import { invoices, formatCRC } from '../../data/mockData';
+import { jsPDF } from 'jspdf';
+import { useContext } from 'react';
+import { ToastContext } from '../../context/ToastContext';
 
 export default function InvoiceDetail() {
   const { id } = useParams();
@@ -10,6 +13,7 @@ export default function InvoiceDetail() {
   const subtotal = inv.items.reduce((s, i) => s + i.total, 0);
   const iva = Math.round(subtotal * 0.13);
   const total = subtotal + iva;
+  const { showToast } = useContext(ToastContext);
 
   return (
     <div className="admin-layout">
@@ -100,6 +104,31 @@ export default function InvoiceDetail() {
             </button>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="btn btn-outline btn-sm" onClick={() => window.print()}>🖨️ Imprimir</button>
+              <button className="btn btn-outline btn-sm" onClick={() => {
+                try {
+                  const doc = new jsPDF();
+                  doc.setFontSize(16);
+                  doc.text('Factura ' + inv.id, 14, 20);
+                  doc.setFontSize(11);
+                  doc.text(`Cliente: ${inv.cliente}`, 14, 30);
+                  doc.text(`Fecha: ${inv.fecha}`, 14, 36);
+                  let y = 48;
+                  doc.text('Productos:', 14, y);
+                  y += 6;
+                  inv.items.forEach((it, idx) => {
+                    doc.text(`${idx + 1}. ${it.producto} x${it.cantidad} - ${formatCRC(it.total)}`, 16, y);
+                    y += 6;
+                    if (y > 270) { doc.addPage(); y = 20; }
+                  });
+                  y += 6;
+                  doc.text(`Subtotal: ${formatCRC(subtotal)}`, 14, y);
+                  y += 6;
+                  doc.text(`IVA: ${formatCRC(iva)}`, 14, y);
+                  y += 6;
+                  doc.text(`Total: ${formatCRC(total)}`, 14, y);
+                  doc.save(`${inv.id}.pdf`);
+                } catch (err) { console.error('PDF export failed', err); showToast && showToast('Error al generar PDF', { duration: 3000 }); }
+              }}>⬇️ Descargar PDF</button>
               <button className="btn btn-primary btn-sm" onClick={() => {
                 // export invoice as CSV
                 const rows = [['Producto','Cantidad','Precio Unitario','Total']];

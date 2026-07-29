@@ -1,12 +1,23 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import AdminSidebar from '../../components/AdminSidebar';
-import { products as initialProducts, categories, formatCRC } from '../../data/mockData';
+import { categories, formatCRC } from '../../data/mockData';
 import { AuthContext } from '../../context/AuthContext';
+
+const loadProducts = () => {
+  try { return JSON.parse(localStorage.getItem('bb_products')) || []; } catch { return []; }
+};
 
 const emptyProduct = { name: '', category: 'Ropa', supplier: '', priceUSD: '', stock: '' };
 
 export default function Products() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState(() => {
+    const p = loadProducts();
+    return (p && p.length) ? p : [];
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('bb_products', JSON.stringify(products)); } catch {}
+  }, [products]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todas las categorías');
   const [showModal, setShowModal] = useState(false);

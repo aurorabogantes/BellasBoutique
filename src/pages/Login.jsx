@@ -2,22 +2,26 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { AuthContext } from '../context/AuthContext';
+import { ToastContext } from '../context/ToastContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login, recoverPassword } = useContext(AuthContext);
   const [form, setForm] = useState({ email: '', password: '', remember: false });
   const [error, setError] = useState(null);
+  const { showToast } = useContext(ToastContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = login({ correo: form.email, password: form.password });
+    const res = await login({ correo: form.email, password: form.password });
     if (!res.ok) {
       setError(res.error || 'Error de login');
+      showToast?.(res.error || 'Error de login', { duration: 3500 });
       return;
     }
-    // redirect based on role inference
-    if (form.email.includes('admin')) navigate('/admin/dashboard');
+    // redirect based on role
+    const rol = res.user?.rol || (form.email.includes('admin') ? 'Administrador' : 'Cliente');
+    if (rol === 'Administrador') navigate('/admin/dashboard');
     else navigate('/catalogo');
   };
 
@@ -94,7 +98,30 @@ export default function Login() {
                   />
                   Recordarme
                 </label>
-                <a href="#" className="login-forgot">¿Olvidó su contraseña?</a>
+                <a href="#" className="login-forgot" onClick={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const { confirm } = await import('../context/ConfirmContext');
+                  } catch {}
+                  // use ConfirmContext prompt style
+                  const confModule = await import('../context/ConfirmContext');
+                  const ctx = confModule.ConfirmContext;
+                  // fallback: use window.prompt if context unavailable
+                  const email = await new Promise((res) => {
+                    // try to use the global Confirm modal by dispatching an input request
+                    const ev = new CustomEvent('bb-confirm-prompt', { detail: { prompt: true, callback: res } });
+                    window.dispatchEvent(ev);
+                    // fallback timeout to prompt
+                    setTimeout(() => {
+                      const fallback = window.prompt('Ingrese su correo para recuperar la contraseña');
+                      res(fallback);
+                    }, 300);
+                  });
+                  if (!email) return;
+                  const r = await recoverPassword(email);
+                  if (!r.ok) { showToast?.(r.error || 'Error', { duration: 3500 }); return; }
+                  showToast?.('Nueva contraseña enviada por correo (simulado)', { duration: 4000 });
+                }}>¿Olvidó su contraseña?</a>
               </div>
 
               <button type="submit" className="btn btn-primary btn-full">

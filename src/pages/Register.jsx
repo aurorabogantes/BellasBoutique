@@ -21,17 +21,23 @@ export default function Register() {
   });
 
   const checks = validate(form.password);
-  const { addActivity } = useContext(AuthContext);
+  const { addActivity, register } = useContext(AuthContext);
 
   const { showToast } = useContext(ToastContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // basic validations
     if (!form.correo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.correo)) return showToast?.('Correo inválido', { duration: 3500 });
-    if (form.password.length < 8) return showToast?.('Contraseña demasiado corta', { duration: 3500 });
     if (form.password !== form.confirm) return showToast?.('Las contraseñas no coinciden', { duration: 3500 });
-    if (addActivity) addActivity('Registro de usuario', { correo: form.correo, nombre: form.nombre });
+    // enforce strong password rules
+    const okUpper = /[A-Z]/.test(form.password);
+    const okLower = /[a-z]/.test(form.password);
+    const okNumber = /[0-9]/.test(form.password);
+    const okSpecial = /[^A-Za-z0-9]/.test(form.password);
+    if (!(okUpper && okLower && okNumber && okSpecial && form.password.length >= 8)) return showToast?.('La contraseña debe tener mayúscula, minúscula, número y carácter especial', { duration: 4500 });
+    const res = await register({ nombre: form.nombre, apellidos: form.apellidos, correo: form.correo, password: form.password, telefono: form.telefono, direccion: form.direccion, cedula: form.cedula, rol: form.rol });
+    if (!res.ok) { showToast?.(res.error || 'Error', { duration: 3500 }); return; }
     showToast?.('Cuenta creada. Inicia sesión.', { duration: 3000 });
     navigate('/');
   };

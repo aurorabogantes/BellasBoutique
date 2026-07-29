@@ -66,7 +66,14 @@ export default function FAQ() {
             ) : (
               <button
                 className="btn btn-primary btn-sm"
-                onClick={() => { if (rating > 0) setSent(true); }}
+                onClick={() => {
+                  if (rating > 0) {
+                    const store = JSON.parse(localStorage.getItem('bb_surveys') || '[]');
+                    const entry = { id: Date.now(), rating, comment, ts: new Date().toISOString() };
+                    store.unshift(entry); localStorage.setItem('bb_surveys', JSON.stringify(store));
+                    setSent(true); try { const act = JSON.parse(localStorage.getItem('bb_activity_log')||'[]'); act.unshift({ id: Date.now(), user: { correo: 'anon' }, action: 'Encuesta enviada', meta: { rating }, ts: new Date().toISOString() }); localStorage.setItem('bb_activity_log', JSON.stringify(act)); } catch {}
+                  }
+                }}
               >
                 ✉ Enviar Encuesta
               </button>
@@ -142,7 +149,15 @@ export default function FAQ() {
             ) : (
               <button
                 className="btn btn-primary btn-sm"
-                onClick={() => { if (suggestion.trim()) setSuggSent(true); }}
+                onClick={() => {
+                  if (suggestion.trim()) {
+                    const store = JSON.parse(localStorage.getItem('bb_suggestions') || '[]');
+                    const entry = { id: Date.now(), text: suggestion.trim(), ts: new Date().toISOString() };
+                    store.unshift(entry); localStorage.setItem('bb_suggestions', JSON.stringify(store));
+                    setSuggSent(true);
+                    try { const act = JSON.parse(localStorage.getItem('bb_activity_log')||'[]'); act.unshift({ id: Date.now(), user: { correo: 'anon' }, action: 'Sugerencia enviada', meta: { text: suggestion.trim() }, ts: new Date().toISOString() }); localStorage.setItem('bb_activity_log', JSON.stringify(act)); } catch {}
+                  }
+                }}
               >
                 ✉ Enviar Sugerencia
               </button>
