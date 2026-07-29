@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import { products as catalogProducts } from '../data/mockData';
 import { AuthContext } from './AuthContext';
 import { ToastContext } from './ToastContext';
