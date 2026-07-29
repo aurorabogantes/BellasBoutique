@@ -248,6 +248,16 @@ export const chatMessages = [
   },
 ];
 
+// ── MensajesChat (alias de chatMessages para admin) ─────────────────────────
+export const mensajesChat = chatMessages;
+
+// ── Sugerencias quemadas que ve el administrador ────────────────────────────
+export const suggestions = [
+  { id: 'S1001', text: 'Agregar más tallas para vestidos populares.', ts: '2026-07-01T10:12:00Z' },
+  { id: 'S1002', text: 'Ofrecer envíos rápidos en el GAM por una tarifa reducida.', ts: '2026-07-05T14:22:00Z' },
+  { id: 'S1003', text: 'Implementar filtros por talla y color en el catálogo.', ts: '2026-07-10T09:03:00Z' },
+];
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 export const formatCRC = (amount) =>
   '₡' + amount.toLocaleString('es-CR');

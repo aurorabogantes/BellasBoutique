@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import { CartContext } from '../context/CartContext';
 import { formatCRC, paymentMethods } from '../data/mockData';
 import { AuthContext } from '../context/AuthContext';
+import Survey from '../components/Survey';
 
 const IVA = 0.13;
 const today = new Date().toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -135,6 +136,9 @@ export default function Checkout() {
               <button className="btn btn-primary" onClick={() => navigate('/catalogo')}>Seguir comprando</button>
               <button className="btn btn-outline" onClick={() => setShowEmailModal(true)}>Ver correo enviado</button>
             </div>
+          </div>
+          <div style={{ marginTop: 20 }}>
+            <Survey />
           </div>
         </div>
 

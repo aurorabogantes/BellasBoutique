@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { products, categories, formatCRC } from '../data/mockData';
+import Survey from '../components/Survey';
 import { CartContext } from '../context/CartContext';
 
 export default function Catalog() {
@@ -90,6 +91,9 @@ export default function Catalog() {
               </div>
             </div>
           ))}
+        </div>
+        <div style={{ marginTop: 28 }}>
+          <Survey compact={true} />
         </div>
       </div>
     </>

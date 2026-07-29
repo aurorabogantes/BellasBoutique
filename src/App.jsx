@@ -29,6 +29,8 @@ import Bitacora from './pages/admin/Bitacora';
 import Emails from './pages/admin/Emails';
 import IntentosLogin from './pages/admin/IntentosLogin';
 import Surveys from './pages/admin/Surveys';
+import MensajesChatAdmin from './pages/admin/MensajesChat';
+import SugerenciasAdmin from './pages/admin/Sugerencias';
 // Vendor pages
 import VendorDashboard from './pages/vendor/Dashboard';
 
@@ -66,6 +68,8 @@ export default function App() {
           <Route path="/admin/intentolog" element={<ProtectedRoute role="Administrador"><IntentosLogin /></ProtectedRoute>} />
           <Route path="/admin/emails" element={<ProtectedRoute role="Administrador"><Emails /></ProtectedRoute>} />
           <Route path="/admin/encuestas" element={<ProtectedRoute role="Administrador"><Surveys /></ProtectedRoute>} />
+          <Route path="/admin/mensajes-chat" element={<ProtectedRoute role="Administrador"><MensajesChatAdmin /></ProtectedRoute>} />
+          <Route path="/admin/sugerencias" element={<ProtectedRoute role="Administrador"><SugerenciasAdmin /></ProtectedRoute>} />
           <Route path="/admin/configuracion" element={<Navigate to="/admin/dashboard" replace />} />
 
           {/* Fallback */}
